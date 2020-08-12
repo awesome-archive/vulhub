@@ -1,0 +1,98 @@
+name: Vulhub Docker Image CI
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+jobs:
+
+  images-test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: active-mq
+      run: |
+        bash tests/images-build.sh base/activemq/5.11.1 base/activemq/5.11.1/with-cron base/activemq/5.13.2
+    - name: apereo-cas
+      run: |
+        bash tests/images-build.sh base/apereo-cas/4.1.5
+    - name: appweb
+      run: |
+        bash tests/images-build.sh base/appweb/7.0.1
+    - name: aria2
+      run: |
+        bash tests/images-build.sh base/aria2/1.18.8
+    - name: baselinux
+      run: |
+        bash tests/images-build.sh base/baselinux/centos-6
+    - name: bash
+      run: |
+        bash tests/image-build.sh base/bash/4.3.0 "vulhub/bash:4.3.0"
+        bash tests/images-build.sh base/bash/4.3.0/with-httpd
+    - name: bind
+      run: |
+        bash tests/images-build.sh base/bind/latest
+    # missed: coldfusion
+    - name: confluence
+      run: |
+        bash tests/images-build.sh base/confluence/6.10.2 base/confluence/6.11.2
+    - name: couchdb
+      run: |
+        bash tests/images-build.sh base/couchdb/1.6.0 base/couchdb/2.1.0
+    - name: discuz
+      run: |
+        bash tests/images-build.sh base/discuzx/3.4-20170801 base/discuzx/7.2
+    - name: django
+      run: |
+        bash tests/images-build.sh base/django/1.11.4 base/django/2.2.3 base/django/3.0.3 
+    # missed: docker
+    - name: drupal
+      run: |
+        bash tests/images-build.sh base/drupal/7.31 base/drupal/8.5.0
+    - name: ecshop
+      run: |
+        bash tests/images-build.sh base/ecshop/2.7.3 base/ecshop/3.6.0
+    - name: cleanup
+      run: |
+        docker image prune -a -f
+    - name: elasticsearch
+      run: |
+        bash tests/images-build.sh base/elasticsearch/1.1.1 base/elasticsearch/1.4.2 base/elasticsearch/1.4.4 base/elasticsearch/1.5.1 base/elasticsearch/1.6.0 base/elasticsearch/5.6.16 base/elasticsearch/6.8.6
+    # missed: electron
+    - name: fastjson
+      run: |
+        bash tests/images-build.sh base/fastjson/1.2.24 base/fastjson/1.2.45
+    - name: ffmpeg
+      run: |
+        bash tests/image-build.sh base/ffmpeg/2.8.4 "vulhub/ffmpeg:2.8.4"
+        bash tests/image-build.sh base/ffmpeg/3.2.4 "vulhub/ffmpeg:3.2.4"
+        bash tests/images-build.sh base/ffmpeg/2.8.4-php base/ffmpeg/3.2.4-php
+    - name: flask
+      run: |
+        bash tests/images-build.sh base/flask/1.1.1
+    - name: ghostscript
+      run: |
+        bash tests/image-build.sh base/ghostscript/9.21 "vulhub/ghostscript:9.21"
+        bash tests/image-build.sh base/ghostscript/9.23 "vulhub/ghostscript:9.23"
+        bash tests/images-build.sh base/ghostscript/9.21/with-flask base/ghostscript/9.23/with-flask base/ghostscript/9.25 base/ghostscript/9.26
+    - name: git
+      run: |
+        bash tests/images-build.sh base/git/2.12.2
+    - name: gitea
+      run: |
+        bash tests/images-build.sh base/gitea/1.4.0
+    - name: gitlist
+      run: |
+        bash tests/images-build.sh base/gitlist/0.6.0
+    - name: glassfish
+      run: |
+        bash tests/images-build.sh base/glassfish/4.1
+    - name: goahead
+      run: |
+        bash tests/images-build.sh base/goahead/3.6.4
+    - name: gogs
+      run: |
+        bash tests/images-build.sh base/gogs/0.11.66
