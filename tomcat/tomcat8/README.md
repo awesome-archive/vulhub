@@ -1,6 +1,6 @@
 # Tomcat7+ Weak Password && Backend Getshell Vulnerability
 
-[中文版本(Chinese version)](README.zh-cn.md) 
+[中文版本(Chinese version)](README.zh-cn.md)
 
 Tomcat version: 8.0
 
@@ -50,7 +50,7 @@ There are no users by default in Tomcat8 through normal installation, and the ma
 Just run：
 
 ```
-docker-compose up -d
+docker compose up -d
 ```
 
 Open the tomcat management page `http://your-ip:8080/manager/html`，enter the weak password `tomcat:tomcat`，then access the backend：
@@ -58,4 +58,3 @@ Open the tomcat management page `http://your-ip:8080/manager/html`，enter the w
 ![](1.png)
 
 Upload war package and then get shell directly.
-

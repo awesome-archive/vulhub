@@ -1,6 +1,6 @@
 FROM php:7.2-apache
 
-MAINTAINER phithon <root@leavesongs.com>
+LABEL maintainer="phithon <root@leavesongs.com>"
 
 ARG MIRROR_URL=https://github.com/vulhub/mirrors/raw/master/debian/stretch/aliyun.list
 
@@ -23,7 +23,7 @@ COPY composer.json /var/www/
 
 RUN set -ex \
     && cd /var/www \
-    && curl -#sSL https://getcomposer.org/composer.phar -o composer.phar \
+    && curl -#sSL https://getcomposer.org/download/2.3.10/composer.phar -o composer.phar \
     && php composer.phar install \
     && chown www-data:www-data -R .
 

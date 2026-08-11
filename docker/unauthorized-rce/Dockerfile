@@ -1,7 +1,7 @@
-FROM vulhub/docker:18.03.0
+FROM vulhub/docker:28.0.1
 
 LABEL maintainer="phithon <root@leavesongs.com>"
 
-ADD docker-entrypoint.sh /
+COPY docker-entrypoint.sh /
 
 ENTRYPOINT [ "/docker-entrypoint.sh" ]

@@ -1,104 +1,119 @@
-# Vulhub - Pre-Built Vulnerable Environments Based on Docker-Compose
+<!-- markdownlint-disable first-line-heading -->
+<p align="center">
+  <a href="https://vulhub.org" target="_blank"><img src=".github/assets/banner.png" alt="Vulhub" height="auto" /></a>
+</p>
 
-[![Docker Stars](https://img.shields.io/badge/docker%20stars-20k-blue.svg)](https://hub.docker.com/u/vulhub/) [![GitHub](https://img.shields.io/github/license/vulhub/vulhub.svg)](https://github.com/vulhub/vulhub/blob/master/LICENSE)
- [![Chat on Discord](https://img.shields.io/discord/485505185167179778.svg)](https://discord.gg/GhMB3Z) [![Backers and sponors on Patreon](https://img.shields.io/badge/sponsor-patreon-73d6a1.svg)](https://www.patreon.com/phith0n) [![Backers and sponors on Opencollective](https://img.shields.io/badge/backer-opencollective-f89a76.svg)](https://opencollective.com/vulhub#backer)
+<p align="center">
+  <a href="https://discord.gg/bQCpZEK" target="_blank"><img src="https://img.shields.io/discord/485505185167179778.svg" alt="Chat on Discord"></a>
+  <a href="https://github.com/sponsors/phith0n" target="_blank"><img src="https://img.shields.io/github/sponsors/phith0n?color=aqua" alt="GitHub Sponsors"></a>
+  <a href="https://vulhub.org/environments" target="_blank"><img alt="Vulnerabilities count" src="https://img.shields.io/badge/dynamic/json?url=https://vulhub.org/api/statistic&query=%24.environments&label=vulnerabilities"></a>
+  <img alt="GitHub language count" src="https://img.shields.io/github/languages/count/vulhub/vulhub?color=yellow">
+  <a href="https://github.com/vulhub/vulhub/graphs/contributors" target="_blank"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors-anon/vulhub/vulhub?color=orange"></a>
+  <a href="https://github.com/vulhub/vulhub/blob/master/LICENSE" target="_blank"><img src="https://img.shields.io/github/license/vulhub/vulhub.svg" alt="GitHub"></a>
+</p>
+
+Vulhub is an open-source collection of pre-built, ready-to-use vulnerable Docker environments. With just one command you can launch a vulnerable environment for security research, learning, or demonstration, no prior Docker experience required.
 
 [中文版本(Chinese version)](README.zh-cn.md)
 
- Vulhub is an open-source collection of pre-built vulnerable docker environments. No pre-existing knowledge of docker is required, just execute two simple commands and you have a vulnerable environment.
+## Quick Start
 
-## Installation
-
-Install the docker/docker-compose on Ubuntu 16.04:
+**Install Docker** (example for Ubuntu 24.04):
 
 ```bash
-# Install pip
-curl -s https://bootstrap.pypa.io/get-pip.py | python3
-
 # Install the latest version docker
 curl -s https://get.docker.com/ | sh
 
 # Run docker service
-service docker start
-
-# Install docker compose
-pip install docker-compose
+systemctl start docker
 ```
 
-The installation steps of docker and docker-compose for others operating system might be slightly different, please refer to the [docker documentation](https://docs.docker.com/) for details.
+For other operating systems, see the [Docker documentation](https://docs.docker.com/).
 
-## Usage
+Although all Vulhub environments are running based on Docker Compose, you no longer need to install docker-compose separately. Instead, you can use the built-in `docker compose` command to start Vulhub environments.
+
+**Download and set up Vulhub:**
 
 ```bash
-# Download project
-wget https://github.com/vulhub/vulhub/archive/master.zip -O vulhub-master.zip
-unzip vulhub-master.zip
-cd vulhub-master
-
-# Enter the directory of vulnerability/environment
-cd flask/ssti
-
-# Compile environment
-docker-compose build
-
-# Run environment
-docker-compose up -d
+git clone --depth 1 https://github.com/vulhub/vulhub
 ```
 
-There is a **README** document in each environment directory, please read this file for vulnerability/environment testing and usage.
+**Launch a vulnerable environment:**
 
-After the test, delete the environment with the following command.
+```bash
+cd vulhub/langflow/CVE-2025-3248  # Example: enter a vulnerability directory
+docker compose up -d
 ```
-docker-compose down -v
+
+Each environment directory contains a detailed **README** with reproduction steps and usage instructions.
+
+**Clean up after testing:**
+
+```bash
+docker compose down -v
 ```
 
-It is recommended to use a VPS of at least 1GB memory to build a vulnerability environment. The `your-ip` mentioned in the documentation refers to the IP address of your VPS. If you are using a virtual machine, it refers to your virtual machine IP, not the IP inside the docker container.
+> [!NOTE]
+>
+> - Use a VPS or VM with at least 1GB RAM for best results
+> - The `your-ip` in documentation refers to your host/VPS IP, not the Docker container IP
+> - Ensure Docker has permission to access all files in the current directory to avoid permission errors
+> - Some environments may not support ARM architectures, see [Troubleshooting](#troubleshooting) for details
+> - **All environments are for testing and educational purposes only. Do not use in production!**
 
-**All environments in this project are for testing purposes only and should not be used as a production environment!**
+## Troubleshooting
 
-## Notice
+**Docker image pull fails in mainland China**
 
-1. To prevent permission errors, it is best to use the root user to execute the docker and docker-compose commands.
-2. Some docker images do not support running on ARM machines.
+Docker Hub may be inaccessible from mainland China. Use a registry mirror or run Vulhub on an overseas VPS.
 
-## Contribution
+**Environments fail to start on Apple Silicon (M-series) Macs**
 
-This project relies on docker. So any error during compilation and running are thrown by docker and related programs. Please find the cause of the error by yourself first. If it is determined that the dockerfile is written incorrectly (or the code is wrong in vulhub), then submit the issue. More details please 👉[Common reasons for compilation failure](https://github.com/phith0n/vulhub/wiki/%E7%BC%96%E8%AF%91%E5%A4%B1%E8%B4%A5%E7%9A%84%E5%8E%9F%E5%9B%A0), hope it can help you.
+Most Vulhub environments run natively on Docker Desktop for Mac with M-series chips. If an environment fails, try setting the platform explicitly:
 
-For more question, please contact:
+```bash
+export DOCKER_DEFAULT_PLATFORM=linux/amd64
+docker compose up -d
+```
 
-- [Discord](https://discord.gg/GhMB3Z)
-- [Twitter](https://twitter.com/vulhub)
+**Environments fail on Kali Linux**
 
-Thanks for the following contributors:
+Some environments may fail on Kali Linux due to a low `ulimit nofile` setting. See the [FAQ](https://vulhub.org/documentation/faq) for the fix.
+
+If you encounter issues that you cannot resolve, feel free to seek help from the community:
+
+- [Discord](https://discord.gg/bQCpZEK)
+- [X (Twitter)](https://x.com/vulhub)
+
+## Contributing
+
+We welcome contributions! Please read our [Contributing Guide](CONTRIBUTING.md) to get started.
+
+Thanks to all contributors:
 
 [![](https://opencollective.com/vulhub/contributors.svg?width=890&button=false)](https://github.com/vulhub/vulhub/graphs/contributors)
 
-More contributors：[Contributors List](contributors.md)
+## Partners
 
-## Backer and Sponsor
-
-Sponsor:
+Our partners and users:
 
 <p>
-  <a href="https://www.chaitin.cn" target="_blank"><img src="https://vulhub.org/img/sponsor/chaitin.png" width="200"></a>
-  <a href="https://xianzhi.aliyun.com/" target="_blank"><img src="https://vulhub.org/img/sponsor/aliyun.svg" width="200"></a>
-  <a href="https://www.didiyun.com/?channel=14196" target="_blank"><img src="https://vulhub.org/img/sponsor/didi.png" width="200"></a>
+  <a href="https://www.wangan.com/vulhub" target="_blank"><img src="https://vulhub.org/sponsor/wangan.png" width="200"></a>
+  <a href="https://www.cvebase.com" target="_blank"><img src="https://vulhub.org/sponsor/cvebase.png" width="200"></a>
+  <a href="https://www.huoxian.cn" target="_blank"><img src="https://vulhub.org/sponsor/huoxian.png" width="200"></a>
+  <a href="https://www.chaitin.cn" target="_blank"><img src="https://vulhub.org/sponsor/chaitin.png" width="200"></a>
+  <a href="https://xianzhi.aliyun.com/" target="_blank"><img src="https://vulhub.org/sponsor/aliyun.svg" width="200"></a>
 </p>
 
-Sponsor vulhub on patreon 🙏
-
-<a href="https://www.patreon.com/bePatron?u=12677520"><img src="https://vulhub.org/img/sponsor/patreon.png" width="150"></a>
-
-Sponsor vulhub on opencollective 🙏
+Sponsor Vulhub on [GitHub Sponsor](https://github.com/sponsors/phith0n), [OpenCollective](https://opencollective.com/vulhub#backer), or [Patreon](https://www.patreon.com/bePatron?u=12677520) 🙏
 
 <p>
-  <a href="https://opencollective.com/vulhub#backer"><img src="https://opencollective.com/vulhub/backers.svg?width=138"></a>
-  <a href="https://opencollective.com/vulhub#sponsor"><img src="https://opencollective.com/vulhub/sponsors.svg?width=138"></a>
+  <a href="https://github.com/sponsors/phith0n"><img src="https://opencollective.com/vulhub/backers.svg?width=138"></a>
+  <a href="https://github.com/sponsors/phith0n"><img src="https://opencollective.com/vulhub/sponsors.svg?width=138"></a>
 </p>
 
-More[Donate](http://vulhub.org/#/docs/donate/)。
+More ways to [donate](https://vulhub.org/).
 
 ## License
 
-Vulhub is licensed under the MIT License. See [LICENSE](LICENSE) for the full license text.
+Vulhub is licensed under the MIT License. See [LICENSE](LICENSE) for details.

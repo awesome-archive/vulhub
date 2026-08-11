@@ -1,105 +1,114 @@
-# Vulhub - Docker-Compose files for vulnerabilities environment
+<!-- markdownlint-disable first-line-heading -->
+<p align="center">
+  <a href="https://vulhub.org" target="_blank"><img src=".github/assets/banner.png" alt="Vulhub" height="auto" /></a>
+</p>
 
-[![Docker Stars](https://img.shields.io/badge/docker%20stars-20k-blue.svg)](https://hub.docker.com/u/vulhub/) [![GitHub](https://img.shields.io/github/license/vulhub/vulhub.svg)](https://github.com/vulhub/vulhub/blob/master/LICENSE)
- [![Chat on Discord](https://img.shields.io/discord/485505185167179778.svg)](https://discord.gg/GhMB3Z) [![Backers and sponors on Patreon](https://img.shields.io/badge/sponsor-patreon-73d6a1.svg)](https://www.patreon.com/phith0n) [![Backers and sponors on Opencollective](https://img.shields.io/badge/backer-opencollective-f89a76.svg)](https://opencollective.com/vulhub#backer)
+<p align="center">
+  <a href="https://discord.gg/bQCpZEK" target="_blank"><img src="https://img.shields.io/discord/485505185167179778.svg" alt="Chat on Discord"></a>
+  <a href="https://github.com/sponsors/phith0n" target="_blank"><img src="https://img.shields.io/github/sponsors/phith0n?color=aqua" alt="GitHub Sponsors"></a>
+  <a href="https://vulhub.org/environments" target="_blank"><img alt="Vulnerabilities count" src="https://img.shields.io/badge/dynamic/json?url=https://vulhub.org/api/statistic&query=%24.environments&label=vulnerabilities"></a>
+  <img alt="GitHub language count" src="https://img.shields.io/github/languages/count/vulhub/vulhub?color=yellow">
+  <a href="https://github.com/vulhub/vulhub/graphs/contributors" target="_blank"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors-anon/vulhub/vulhub?color=orange"></a>
+  <a href="https://github.com/vulhub/vulhub/blob/master/LICENSE" target="_blank"><img src="https://img.shields.io/github/license/vulhub/vulhub.svg" alt="GitHub"></a>
+</p>
 
-Vulhub是一个面向大众的开源漏洞靶场，无需docker知识，简单执行两条命令即可编译、运行一个完整的漏洞靶场镜像。
+Vulhub 是一个开源的、即开即用的漏洞靶场环境集合。无需 Docker 基础，只需一条命令即可快速启动用于安全研究、学习或演示的漏洞环境。
 
-## Installation
+## 快速开始
 
-在ubuntu16.04下安装docker/docker-compose:
+**安装 Docker**（以 Ubuntu 24.04 为例）：
 
 ```bash
-# 安装pip
-curl -s https://bootstrap.pypa.io/get-pip.py | python3
-
-# 安装最新版docker
 curl -s https://get.docker.com/ | sh
-
-# 启动docker服务
-service docker start
-
-# 安装compose
-pip install docker-compose 
+systemctl start docker
 ```
 
-其他操作系统安装docker和docker-compose可能会有些许不同，请阅读Docker文档进行安装。
+其他操作系统请参考 [Docker 官方文档](https://docs.docker.com/)。
 
-## Usage
+虽然所有 Vulhub 环境都基于 Docker compose 制作，但你不再需要安装独立的 docker-compose，而是使用 Docker 自带的 compose 命令来启动 Vulhub 环境。
+
+**下载并解压 Vulhub：**
 
 ```bash
-# 下载项目
-wget https://github.com/vulhub/vulhub/archive/master.zip -O vulhub-master.zip
-unzip vulhub-master.zip
-cd vulhub-master
-
-# 进入某一个漏洞/环境的目录
-cd flask/ssti
-
-# 自动化编译环境
-docker-compose build
-
-# 启动整个环境
-docker-compose up -d
+git clone --depth 1 https://github.com/vulhub/vulhub
 ```
 
-每个环境目录下都有相应的说明文件，请阅读该文件，进行漏洞/环境测试。
+**启动一个漏洞环境：**
 
-测试完成后，删除整个环境
-
+```bash
+cd vulhub/langflow/CVE-2025-3248  # Example: enter a vulnerability directory
+docker compose up -d
 ```
-docker-compose down -v
+
+每个环境目录下都包含详细的 **README**，请参阅以了解复现步骤和使用说明。
+
+**测试完成后清理环境：**
+
+```bash
+docker compose down -v
 ```
 
-本项目每个漏洞环境均附带文档，建议你购买1G内存的vps搭建漏洞测试环境，文档中所说的`your-ip`均指你的vps的ip地址，如果你是用虚拟机搭建测试环境，是指你的虚拟机IP，而不是docker容器内部的IP，请不要混淆。
+> [!NOTE]
+>
+> - 推荐使用至少 1GB 内存的 VPS 或虚拟机
+> - 文档中的 `your-ip` 指你的主机/VPS IP，不是 Docker 容器内部 IP
+> - 请确保 Docker 有权限访问当前目录下所有文件，避免权限错误
+> - 部分环境可能不支持 ARM 架构，详见 [常见问题](#常见问题)
+> - **所有环境仅供测试与学习，严禁用于生产环境！**
 
-**本项目中所有环境仅用于测试，不可作为生产环境使用！**
+## 常见问题
 
-## Notice
+**中国大陆拉取镜像失败**
 
-注意事项：
+Docker Hub 在中国大陆可能无法访问，可以使用镜像站加速，或使用境外 VPS 进行测试。
 
-1. 为防止出现权限错误，最好使用root用户执行docker和docker-compose命令
-2. docker部分镜像不支持在ARM等架构的机器上运行
+**Apple Silicon（M 系列芯片）Mac 上环境启动失败**
 
-## Contribution
+大部分 Vulhub 环境可以在 M 系列芯片的 Docker Desktop 上直接运行。如果遇到启动失败，可以尝试指定平台后再运行：
 
-本项目依赖于docker，在编译及运行过程中出现的任意异常都是docker以及相关程序抛出的，请先自行查找错误原因。如果确定是因为Dockerfile编写错误（或vulhub中代码错误）导致的，再提交issue。更多说明请[这篇文档](https://github.com/phith0n/vulhub/wiki/%E7%BC%96%E8%AF%91%E5%A4%B1%E8%B4%A5%E7%9A%84%E5%8E%9F%E5%9B%A0)，希望可以对你有所帮助。
+```bash
+export DOCKER_DEFAULT_PLATFORM=linux/amd64
+docker compose up -d
+```
 
-更多问题，可以用如下方式和我们联系：
+**Kali Linux 上环境运行失败**
 
-- [Discord](https://discord.gg/GhMB3Z)
-- [Twitter](https://twitter.com/vulhub)
+部分环境在 Kali Linux 上运行失败，可能是因为 `ulimit nofile` 设置过低，请参考 [FAQ](https://vulhub.org/documentation/faq) 进行修复。
 
-感谢如下贡献者：
+如果遇到无法解决的问题，欢迎到社区寻求帮助：
+
+- [Discord](https://discord.gg/bQCpZEK)
+- [X (Twitter)](https://x.com/vulhub)
+
+## 贡献
+
+欢迎贡献！请阅读 [贡献指南](CONTRIBUTING.md) 了解详情。
+
+感谢所有贡献者：
 
 [![](https://opencollective.com/vulhub/contributors.svg?width=890&button=false)](https://github.com/vulhub/vulhub/graphs/contributors)
 
-更多无法体现在Contributors里的贡献者：[Contributors List](contributors.md)
+## 合作伙伴
 
-## Backer and Sponsor
-
-赞助商：
+我们的合作伙伴与用户：
 
 <p>
-  <a href="https://www.chaitin.cn" target="_blank"><img src="https://vulhub.org/img/sponsor/chaitin.png" width="200"></a>
-  <a href="https://xianzhi.aliyun.com/" target="_blank"><img src="https://vulhub.org/img/sponsor/aliyun.svg" width="200"></a>
-  <a href="https://www.didiyun.com/?channel=14196" target="_blank"><img src="https://vulhub.org/img/sponsor/didi.png" width="200"></a>
+  <a href="https://www.wangan.com/vulhub" target="_blank"><img src="https://vulhub.org/sponsor/wangan.png" width="200"></a>
+  <a href="https://www.cvebase.com" target="_blank"><img src="https://vulhub.org/sponsor/cvebase.png" width="200"></a>
+  <a href="https://www.huoxian.cn" target="_blank"><img src="https://vulhub.org/sponsor/huoxian.png" width="200"></a>
+  <a href="https://www.chaitin.cn" target="_blank"><img src="https://vulhub.org/sponsor/chaitin.png" width="200"></a>
+  <a href="https://xianzhi.aliyun.com/" target="_blank"><img src="https://vulhub.org/sponsor/aliyun.svg" width="200"></a>
 </p>
 
-在patreon上赞助vulhub 🙏 
-
-<a href="https://www.patreon.com/bePatron?u=12677520"><img src="https://vulhub.org/img/sponsor/patreon.png" width="150"></a>
-
-在opencollective上赞助vulhub 🙏 
+欢迎通过 [GitHub Sponsor](https://github.com/sponsors/phith0n)、[OpenCollective](https://opencollective.com/vulhub#backer) 或 [Patreon](https://www.patreon.com/bePatron?u=12677520) 支持 Vulhub 🙏
 
 <p>
-  <a href="https://opencollective.com/vulhub#backer"><img src="https://opencollective.com/vulhub/backers.svg?width=138"></a>
-  <a href="https://opencollective.com/vulhub#sponsor"><img src="https://opencollective.com/vulhub/sponsors.svg?width=138"></a>
+  <a href="https://github.com/sponsors/phith0n"><img src="https://opencollective.com/vulhub/backers.svg?width=138"></a>
+  <a href="https://github.com/sponsors/phith0n"><img src="https://opencollective.com/vulhub/sponsors.svg?width=138"></a>
 </p>
 
-更多[捐助途径](http://vulhub.org/#/docs/donate/)。
+更多 [捐助方式](https://vulhub.org)。
 
 ## License
 
-Vulhub is licensed under the MIT License. See [LICENSE](LICENSE) for the full license text.
+Vulhub 遵循 MIT License，详见 [LICENSE](LICENSE)。

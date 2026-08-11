@@ -1,7 +1,6 @@
-version: '2'
 services:
  apache:
-   image: vulhub/httpd:2.4-with-ssi
+   image: vulhub/php:7.4.33-apache
    ports:
     - "8080:80"
    volumes:

@@ -8,19 +8,19 @@ In 2017 and previous versions, there was a SQL injection vulnerability that coul
 
 Reference link:
 
-- http://ringk3y.com/2018/08/31/ecshop2-x代码执行/
+- https://paper.seebug.org/691/
 
 ## Environment setup
 
 Run the following commands to start environment
 
 ```
-docker-compose up -d
+docker compose up -d
 ```
 
 After the environment start, visit `http://your-ip:8080`, you will see the 2.7.3 installation page. Visit `http://your-ip:8081`, you will see the 3.6.0 installation page.
 
-Install both of them, mysql address is `mysql`, mysql account and password are `root`, the database name is free to fill in, but the database names of 2.7.3 and 3.6.0 can not be the same. 
+Install both of them, mysql address is `mysql`, mysql account and password are `root`, the database name is free to fill in, but the database names of 2.7.3 and 3.6.0 can not be the same.
 
 As the picture shows:
 

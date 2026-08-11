@@ -1,16 +1,16 @@
 # S2-015 远程代码执行漏洞
 
-影响版本: 2.0.0 - 2.3.14.2
+影响版本：2.0.0 - 2.3.14.2
 
-漏洞详情: 
+漏洞详情：
 
  - http://struts.apache.org/docs/s2-015.html
 
 ## 测试环境搭建
 
 ```
-docker-compose build
-docker-compose up -d
+docker compose build
+docker compose up -d
 ```
 
 ## 原理与测试

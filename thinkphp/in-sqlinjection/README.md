@@ -7,14 +7,14 @@
 Details to read the references：
 
 - https://www.leavesongs.com/PENETRATION/thinkphp5-in-sqlinjection.html
-- https://xianzhi.aliyun.com/forum/read/1813.html
+- https://xz.aliyun.com/t/125
 
 ## Environment Setup
 
 Enter the following command:
 
 ```
-docker-compose up -d
+docker compose up -d
 ```
 
 Visiting `http://your-ip/index.php?ids[]=1&ids[]=2`, you'll see the username is displayed, indicating that the environment is running successfully.

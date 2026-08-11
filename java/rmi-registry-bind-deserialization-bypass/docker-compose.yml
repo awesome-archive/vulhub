@@ -1,0 +1,7 @@
+services:
+  rmi:
+    image: vulhub/j2ee:8u111
+    ports:
+      - 1099:1099
+    environment:
+      - RMIIP=192.168.31.88

